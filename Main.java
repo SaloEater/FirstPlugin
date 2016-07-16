@@ -108,20 +108,15 @@ public class Main extends JavaPlugin{
                                 voteInfo.add(getConfig().getString("timeForVote").replace(" ", "").replace(",", " "));
                                 startVote(commForVote, args);
 
-                                getServer().broadcastMessage(player.getName()+(mainLang.equals("en")?" create vote!":" создал голосование!"));
+                                getServer().broadcastMessage(ChatColor.YELLOW + player.getName() + ChatColor.GRAY + (mainLang.equals("en")?" create vote!":" создал голосование!"));
                                 for (org.bukkit.entity.Player player1 : getServer().getOnlinePlayers()){
                                     player1.performCommand("vote info");
-                                    /*player1.spigot().sendMessage(voteYes);
-                                    player1.spigot().sendMessage(voteNo);*/
                                 }
-
-
-
-
                                 return true;
                             }
                         } else {
-                             player.sendMessage(ChatColor.RED + locStrings.get(0));
+                            player.sendMessage(ChatColor.RED + locStrings.get(0));
+                            return true;
                         }
                         player.sendMessage(ChatColor.RED + locStrings.get(8));
                         getServer().dispatchCommand(sender, "help " + commForVote);
@@ -135,7 +130,7 @@ public class Main extends JavaPlugin{
                                         getConfig().set("vote." + player.getName(), true);
                                         votedPlayers.add(player.getName());
                                          player.sendMessage(ChatColor.GREEN + locStrings.get(6));
-                                         player.sendMessage("Current result: " + ChatColor.GREEN + agreeVotes + ChatColor.WHITE + " : " + ChatColor.RED + disagreeVotes);
+                                         player.sendMessage(ChatColor.GRAY + "Current result: " + ChatColor.GREEN + agreeVotes + ChatColor.GRAY + " : " + ChatColor.RED + disagreeVotes);
                                         return true;
                                     } else {
                                          player.sendMessage(ChatColor.RED + locStrings.get(5));
@@ -151,8 +146,8 @@ public class Main extends JavaPlugin{
                                     if(!votedPlayers.contains(player.getName())){
                                         disagreeVotes++;
                                         votedPlayers.add(player.getName());
-                                         player.sendMessage(ChatColor.DARK_RED + locStrings.get(7));
-                                        player.sendMessage("Current result: " + ChatColor.GREEN + agreeVotes + ChatColor.WHITE + " - " + ChatColor.RED + disagreeVotes);
+                                         player.sendMessage(ChatColor.RED + locStrings.get(7));
+                                        player.sendMessage(ChatColor.GRAY + "Current result: " + ChatColor.GREEN + agreeVotes + ChatColor.GRAY + " - " + ChatColor.RED + disagreeVotes);
                                         return true;
                                     } else {
                                          player.sendMessage(ChatColor.RED + locStrings.get(5));
@@ -165,16 +160,16 @@ public class Main extends JavaPlugin{
 
                             case "info":
                                 if (voteStarted) {
-                                    player.sendMessage("Vote Information:");
+                                    player.sendMessage(ChatColor.GRAY + "Vote Information:");
                                     for(int i=0; i<voteInfo.size(); i++){
-                                        player.sendMessage(voteInfoString.get(i) + " - " + voteInfo.get(i));
+                                        player.sendMessage(ChatColor.RED + "#" + voteInfoString.get(i) + ChatColor.GRAY + " - " + voteInfo.get(i));
                                     }
-                                    player.sendMessage("Current result: " + ChatColor.GREEN + agreeVotes + ChatColor.WHITE + " - " + ChatColor.RED + disagreeVotes);
+                                    player.sendMessage(ChatColor.GRAY + "Current result: " + ChatColor.GREEN + agreeVotes + ChatColor.WHITE + " - " + ChatColor.RED + disagreeVotes);
                                     if(!votedPlayers.contains(player.getName())){
-                                        player.sendMessage("You still didn't vote. Vote: ");
+                                        player.sendMessage(ChatColor.GRAY + "You still didn't vote. Vote: ");
                                         player.sendMessage("");
                                         player.spigot().sendMessage(voteYes);
-                                        player.sendMessage("OR");
+                                        player.sendMessage(ChatColor.DARK_AQUA + "====");
                                         player.spigot().sendMessage(voteNo);
                                     }
                                 } else {
@@ -183,15 +178,30 @@ public class Main extends JavaPlugin{
                                 return true;
 
                             case "help":
-                                player.sendMessage("Below posted commands to voting. Type /help \"command\"");
-                                player.sendMessage("vote - command");
+                                player.sendMessage(ChatColor.GRAY + "To create a vote write: " + ChatColor.DARK_BLUE + "/vote \"command\" \"arguments\"");
+                                player.sendMessage(ChatColor.GRAY + "Below posted commands to voting");
+                                player.sendMessage(ChatColor.GRAY + "Type " + ChatColor.AQUA + "/help \"command\"" + ChatColor.GRAY + " to acquire information about command");
+                                player.sendMessage(ChatColor.RED + "->" + ChatColor.WHITE + "vote" + ChatColor.GRAY + " - " + ChatColor.WHITE + "command" + ChatColor.RED + "<-");
                                 for (int i = 0; i < commandsList.length; i++) {
-                                    player.sendMessage(commandsList[i] + " - " + getConfig().get(commandsList[i] + ".command").toString().replace(" ", ""));
+                                    player.sendMessage(ChatColor.RED + "#" + ChatColor.WHITE + commandsList[i] + ChatColor.GRAY + " - " + ChatColor.WHITE + getConfig().get(commandsList[i] + ".command").toString().replace(" ", ""));
+                                }
+                                return true;
+
+                            case "stop":
+                                if (player.hasPermission("vote.stop")){
+                                    if(voteStarted){
+                                        getServer().broadcastMessage(ChatColor.YELLOW + player.getName() + ChatColor.RED + " stop the vote!");
+                                        voteStopped=true;
+                                        voteStarted=false;
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "There is no vote to stop");
+                                    }
                                 }
                                 return true;
 
                             default:
-                                player.sendMessage(ChatColor.RED + locStrings.get(8));
+                                player.sendMessage(ChatColor.RED + "No such command.");
+                                player.performCommand("vote help");
                                 return true;
                         }
                     }
@@ -241,9 +251,9 @@ public class Main extends JavaPlugin{
     }
 
     private void registerVoteInfoText(){
-        voteInfoString.add((mainLang.equals("en")?"Nickname: ":"Ник: "));
-        voteInfoString.add((mainLang.equals("en")?"Command: ":"Команда: "));
-        voteInfoString.add((mainLang.equals("en")?"Time left: ":"Оставшееся время: "));
+        voteInfoString.add((mainLang.equals("en")?"Nickname:":"Ник:"));
+        voteInfoString.add((mainLang.equals("en")?"Command:":"Команда:"));
+        voteInfoString.add((mainLang.equals("en")?"Time left:":"Оставшееся время:"));
     }
 
     private boolean arrContain(String command){
@@ -265,11 +275,12 @@ public class Main extends JavaPlugin{
     private void startVote(String command, String[] args){
         voteTask = Bukkit.getScheduler().runTaskLater(this, () -> {
             voteStopped=true;
+            voteStarted=false;
             if(agreeVotes>=disagreeVotes){
-                getServer().broadcastMessage(locStrings.get(2));
+                getServer().broadcastMessage(ChatColor.GREEN + locStrings.get(2));
                 dispatchCommand(command, args);
             } else {
-                getServer().broadcastMessage(locStrings.get(1));
+                getServer().broadcastMessage(ChatColor.RED + locStrings.get(1));
             }
             agreeVotes=0;
             disagreeVotes=0;
@@ -290,18 +301,17 @@ public class Main extends JavaPlugin{
                 if(seconds == 60){
                     minutes += 1;
                     seconds = 0;
-                    getServer().broadcastMessage("Time left for vote: " + (voteDuration-minutes*60-seconds)/60 + "m " + (voteDuration-minutes*60-seconds)%60 + "s");
+                    getServer().broadcastMessage(ChatColor.GRAY + "Time left for vote: " + ChatColor.RED + (voteDuration-minutes*60-seconds)/60 + ChatColor.GRAY + " m " + ChatColor.RED + (voteDuration-minutes*60-seconds)%60 + ChatColor.GRAY +" s");
                 }
                 //if(seconds%60==0)getServer().broadcastMessage("Time left for vote: " + (voteDuration-minutes*60-seconds)/60 + "m " + (voteDuration-minutes*60-seconds)%60 + "s");
                 seconds++;
-                voteInfo.set(2, (voteDuration-minutes*60-seconds)/60 + "m " + (voteDuration-minutes*60-seconds)%60 + "s");
+                voteInfo.set(2, (voteDuration-minutes*60-seconds)/60 + " m " + (voteDuration-minutes*60-seconds)%60 + " s");
             }
         }, 20, 20).getTaskId();
     }
 
     private void clearConfig(){
         for(int i=0; i<votedPlayers.size(); i++){
-            getConfig().set("vote."+votedPlayers.get(i), null);
             votedPlayers.remove(i);
         }
     }

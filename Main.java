@@ -217,10 +217,10 @@ public class Main extends JavaPlugin{
     private void getDurFromCFG(String command){
         String[] obgTime = getConfig().getString(command+".timeForVote").replace(" ", "").split(",");
         for(int i=0; i<obgTime.length; i++){
-            if(obgTime[i].contains("d")){
-                obgTime[i]=obgTime[i].replace("d","");
+            /*if(obgTime[i].contains("h")){
+                obgTime[i]=obgTime[i].replace("h","");
                 voteDuration +=(Integer.valueOf(obgTime[i])*3600);
-            }
+            }*/
             if(obgTime[i].contains("m")){
                 obgTime[i]=obgTime[i].replace("m","");
                 voteDuration +=(Integer.valueOf(obgTime[i])*60);
@@ -241,7 +241,7 @@ public class Main extends JavaPlugin{
         locStrings.add(getConfig().get("locale.voteStarted").toString()); //0
         locStrings.add(getConfig().get("locale.voteNotPass").toString()); //1
         locStrings.add(getConfig().get("locale.votePass").toString()); //2
-        locStrings.add(getConfig().get("locale.votedSucc").toString()); //3
+        locStrings.add(" "); //3
         locStrings.add(" "); //4
         locStrings.add(getConfig().get("locale.cantVoteVoted").toString()); //5
         locStrings.add(getConfig().get("locale.agreeVote").toString()); //6
